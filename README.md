@@ -2,5 +2,5 @@
 
 Run
 ```sh
-sudo nix run --extra-experimental-features 'nix-command flakes' github:0awful/nixos#guest
+sudo nixos-rebuild switch --flake github:0awful/nixos#guest
 ```
