@@ -8,12 +8,11 @@
   pkgs,
   ...
 }: {
-  virtualisation.virtualbox.guest.enable = true;
   nix.settings = {
     trusted-users = ["guest"];
     substituters = [
       "https://nix-community.cachix.org"
-      "https://hyprland.cachix.org"
+      # "https://hyprland.cachix.org"
       "https://cache.nixos.org"
     ];
 
@@ -23,7 +22,7 @@
     auto-optimise-store = true;
     trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      # "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
     ];
   };
   nix.gc = {
@@ -73,7 +72,6 @@
       allowUnfree = true;
     };
   };
-
   # This will add each flake input as a registry
   # To make nix3 commands consistent with your flake
   nix.registry = (lib.mapAttrs (_: flake: {inherit flake;})) ((lib.filterAttrs (_: lib.isType "flake")) inputs);
@@ -88,55 +86,105 @@
     })
     config.nix.registry;
 
-  networking.hostName = "guest";
-  networking.networkmanager.enable = true;
+  # Bootloader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.configurationLimit = 15;
+  boot.loader.efi.canTouchEfiVariables = true;
 
-  boot.loader.grub = {
-    enable = true;
-    device = "/dev/sda";
-    configurationLimit = 5; # TODO: Higher on main machine
-  };
+  boot.initrd.luks.devices."luks-7e224310-4795-40ef-8cfe-035ab0904364".device = "/dev/disk/by-uuid/7e224310-4795-40ef-8cfe-035ab0904364";
+  networking.hostName = "nixos"; # Define your hostname.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
+  # Configure network proxy if necessary
+  # networking.proxy.default = "http://user:password@proxy:port/";
+  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+
+  # Enable networking
+  services.connman.enable = true;
+
+  # Set your time zone.
   time.timeZone = "America/Los_Angeles";
 
+  # Select internationalisation properties.
+  i18n.defaultLocale = "en_US.UTF-8";
+
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "en_US.UTF-8";
+    LC_IDENTIFICATION = "en_US.UTF-8";
+    LC_MEASUREMENT = "en_US.UTF-8";
+    LC_MONETARY = "en_US.UTF-8";
+    LC_NAME = "en_US.UTF-8";
+    LC_NUMERIC = "en_US.UTF-8";
+    LC_PAPER = "en_US.UTF-8";
+    LC_TELEPHONE = "en_US.UTF-8";
+    LC_TIME = "en_US.UTF-8";
+  };
+
+  # Enable the X11 windowing system.
+  services.xserver.enable = true;
+
+  # Enable the Enlightenment Desktop Environment.
+  services.xserver.displayManager.lightdm.enable = true;
+  services.xserver.desktopManager.enlightenment.enable = true;
+
+  # Enable acpid
+  services.acpid.enable = true;
+
+  # Configure keymap in X11
   services.xserver = {
-    enable = true;
-    displayManager = {
-      sddm.enable = true;
-      defaultSession = "xfce";
-    };
-
-    desktopManager.xfce.enable = true;
-
-    # Make caps control.
-    xkb = {
-      options = "ctrl:nocaps";
-      layout = "us";
-    };
-  };
-  # Make tapped caps escape.
-  services.interception-tools = let
-    dfkConfig = pkgs.writeText "dual-function-keys.yaml" ''
-      MAPPINGS:
-        - KEY: KEY_CAPSLOCK
-          TAP: KEY_ESC
-          HOLD: KEY_LEFTCTRL
-    '';
-  in {
-    enable = true;
-    plugins = lib.mkForce [
-      pkgs.interception-tools-plugins.dual-function-keys
-    ];
-    udevmonConfig = ''
-      - JOB: "${pkgs.interception-tools}/bin/intercept -g $DEVNODE | ${pkgs.interception-tools-plugins.dual-function-keys}/bin/dual-function-keys -c ${dfkConfig} | ${pkgs.interception-tools}/bin/uinput -d $DEVNODE"
-        DEVICE:
-          EVENTS:
-            EV_KEY: [[KEY_CAPSLOCK, KEY_ESC, KEY_LEFTCTRL]]
-    '';
+    layout = "us";
+    xkbVariant = "";
   };
 
+  # Enable CUPS to print documents.
+  services.printing.enable = true;
+
+  # Enable sound with pipewire.
   sound.enable = true;
-  hardware.pulseaudio.enable = true;
+  hardware.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    # If you want to use JACK applications, uncomment this
+    #jack.enable = true;
+
+    # use the example session manager (no others are packaged yet so this is enabled by default,
+    # no need to redefine it in your config for now)
+    #media-session.enable = true;
+  };
+
+  # Enable touchpad support (enabled default in most desktopManager).
+  # services.xserver.libinput.enable = true;
+
+  environment.variables = {
+    SHELL = "zsh";
+    EDITOR = "hx";
+    TERMINAL = "wezterm";
+    BROWSER = "firefox";
+  };
+  users.users = {
+    guest = {
+      initialPassword = "guest";
+      isNormalUser = true;
+      openssh.authorizedKeys.keys = [
+      ];
+      shell = pkgs.zsh;
+      extraGroups = ["wheel" "networkmanager" "docker"];
+    };
+  };
+
+  # Enable automatic login for the user.
+  services.xserver.displayManager.autoLogin.enable = true;
+  services.xserver.displayManager.autoLogin.user = "guest";
+  # Make caps control.
+  services.xserver.xkb = {
+    options = "ctrl:nocaps";
+    layout = "us";
+  };
+
   environment.systemPackages = with pkgs; [
     # Rust (I'd love this to be a ./rust)
     gcc
@@ -191,43 +239,58 @@
   ];
   programs.zsh.enable = true;
 
-  environment.variables = {
-    SHELL = "zsh";
-    EDITOR = "hx";
-    TERMINAL = "wezterm";
-    BROWSER = "firefox";
-  };
-  users.users = {
-    guest = {
-      # If you do, you can skip setting a root password by passing '--no-root-passwd' to nixos-install.
-      # Be sure to change it (using passwd) after rebooting!
-      initialPassword = "guest";
-      isNormalUser = true;
-      openssh.authorizedKeys.keys = [
-      ];
-      shell = pkgs.zsh;
-      extraGroups = ["wheel" "networkmanager" "docker"];
-    };
-  };
-
   home-manager = {
     extraSpecialArgs = {inherit inputs outputs;};
     users = {
       guest = import ../home-manager;
     };
   };
-  # This setups a SSH server. Very important if you're setting up a headless system.
-  # Feel free to remove if you don't need it.
-  # services.openssh = {
+
+  # Make tapped caps escape.
+  services.interception-tools = let
+    dfkConfig = pkgs.writeText "dual-function-keys.yaml" ''
+      MAPPINGS:
+        - KEY: KEY_CAPSLOCK
+          TAP: KEY_ESC
+          HOLD: KEY_LEFTCTRL
+    '';
+  in {
+    enable = true;
+    plugins = lib.mkForce [
+      pkgs.interception-tools-plugins.dual-function-keys
+    ];
+    udevmonConfig = ''
+      - JOB: "${pkgs.interception-tools}/bin/intercept -g $DEVNODE | ${pkgs.interception-tools-plugins.dual-function-keys}/bin/dual-function-keys -c ${dfkConfig} | ${pkgs.interception-tools}/bin/uinput -d $DEVNODE"
+        DEVICE:
+          EVENTS:
+            EV_KEY: [[KEY_CAPSLOCK, KEY_ESC, KEY_LEFTCTRL]]
+    '';
+  };
+
+  # Some programs need SUID wrappers, can be configured further or are
+  # started in user sessions.
+  # programs.mtr.enable = true;
+  # programs.gnupg.agent = {
   #   enable = true;
-  #   settings = {
-  #     # Forbid root login through SSH.
-  #     PermitRootLogin = "no";
-  #     # Use keys only. Remove if you want to SSH using password (not recommended)
-  #     PasswordAuthentication = false;
-  #   };
+  #   enableSSHSupport = true;
   # };
 
-  # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  system.stateVersion = "23.11";
+  # List services that you want to enable:
+
+  # Enable the OpenSSH daemon.
+  # services.openssh.enable = true;
+
+  # Open ports in the firewall.
+  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Or disable the firewall altogether.
+  # networking.firewall.enable = false;
+
+  # This value determines the NixOS release from which the default
+  # settings for stateful data, like file locations and database versions
+  # on your system were taken. It‘s perfectly fine and recommended to leave
+  # this value at the release version of the first install of this system.
+  # Before changing this value read the documentation for this option
+  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+  system.stateVersion = "23.11"; # Did you read the comment?
 }
