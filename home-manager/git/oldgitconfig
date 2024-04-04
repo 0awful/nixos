@@ -1,0 +1,10 @@
+[user]
+	email = im.izaac.seo@gmail.com
+	name = 0awful
+  signingkey = ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCxMvKAJeaWT71IR9sVXs2Ex6e1eqV1rVPszgD2+Da0HbJKqrNBHXtdn36ILv0TljT7b4mzaRXSMgqh7c0oezzxXqi3GAL3cFsCpHCNqSgC4/lxL8DLJJoDG12GaqREnfNNn8uBOU4SHyle08TYnY5cPRHN/wdt1RnjRU8RKSFFHajnbpImlvB0Gpe04B//x1ua3DN1iBeNiKf7f1GLL8p9ko8y0OfMwWjhhpOuvldYahmdutZbUF2cvi+xaIxw0xMRg5tq7s+wTojrOGm1iUZ26c+bxRJ+BGPAXNGT6fdT2hmEpleyMa7xaLbC7AXpTftJOCFCTk8u3uzYAYNXEUtsGYSq9DEDR3vBSwH7+8u6DGj4a3AhAdmJeuZZ3FKI6lCcqpyC2gm2JhqYYbnmb93920BkLDMw/kX+qt3gXrpjxlm4aTwJKiOwUt9IEpFBFseEPsB0Dhnw3bsWfEwqlak/FU4zECvvMsAS35ZtRO/fh6R8hb8WkcfOXOIOXe2Q9C61FHlu1BcYu61PdOon/4+QXU7pYBAHNNSo6XN+1Xx03Q+6dKtZiWDtuZKuyA6tJxBMYqy3jRBvSqa/y3kflN8mNvq4/orl51R4Xk1ahtWhvu5MKgs/LGQ5SW8XveiSexSjCVs2/IZRiWJUg7KRexucfIR7AR6nk039Xk0iUvM3aw==
+
+[gpg]
+  format = ssh
+
+[commit]
+  gpgsign = true

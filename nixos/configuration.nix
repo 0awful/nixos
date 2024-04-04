@@ -198,6 +198,19 @@
     layout = "us";
   };
 
+  # Enable the 1Password CLI, this also enables a SGUID wrapper so the CLI can authorize against the GUI app
+  programs._1password = {
+    enable = true;
+  };
+
+  # Enable the 1Passsword GUI with myself as an authorized user for polkit
+  programs._1password-gui = {
+    enable = true;
+    polkitPolicyOwners = ["guest"];
+  };    # 1password setup
+  # programs._1password-cli.enable = true;
+
+
   environment.systemPackages = with pkgs; [
     # Rust (I'd love this to be a ./rust)
     # gcc
@@ -233,10 +246,6 @@
     neovim
     lunarvim
 
-    # 1password setup
-    _1password
-    _1password-gui
-    git-credential-1password
 
     unar
     poppler

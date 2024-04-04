@@ -21,6 +21,8 @@
     ./discord # For discord settings
     ./cargo # Similarly cargo settings
     ./nvim
+    ./1password # for ssh key management
+    # ./git # gitconfig
   ];
 
   nixpkgs = {
