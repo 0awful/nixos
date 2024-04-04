@@ -19,6 +19,9 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
+    nur = {
+      url = "github:nix-community/NUR";
+    };
     # TODO: Add any other flake you might need
     # hardware.url = "github:nixos/nixos-hardware";
 
@@ -70,6 +73,7 @@
         modules = [
           # > Our main nixos configuration file <
           ./nixos/configuration.nix
+          inputs.nur.nixosModules.nur
         ];
       };
     };

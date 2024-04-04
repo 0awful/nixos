@@ -92,15 +92,27 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   boot.initrd.luks.devices."luks-7e224310-4795-40ef-8cfe-035ab0904364".device = "/dev/disk/by-uuid/7e224310-4795-40ef-8cfe-035ab0904364";
+
   networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking.nameservers = [
+    "1.1.1.1"
+    "9.9.9.9"
+  ];
+  networking.wireless.enable = true; # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
+  # networking.networkmanager.enable = true;
+  # networking.firewall.enable = false;
+  # networking.networkmanager.firewall.enable = false;
+
   # Enable networking
   services.connman.enable = true;
+
+  # Enable iphone
+  services.usbmuxd.enable = true;
 
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";
@@ -124,8 +136,9 @@
   services.xserver.enable = true;
 
   # Enable the Enlightenment Desktop Environment.
-  services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.desktopManager.enlightenment.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
+  # services.xserver.desktopManager.enlightenment.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
 
   # Enable acpid
   services.acpid.enable = true;
@@ -157,11 +170,11 @@
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
+  services.xserver.libinput.enable = true;
 
   environment.variables = {
     SHELL = "zsh";
-    EDITOR = "hx";
+    EDITOR = "nvim";
     TERMINAL = "wezterm";
     BROWSER = "firefox";
   };
@@ -187,27 +200,52 @@
 
   environment.systemPackages = with pkgs; [
     # Rust (I'd love this to be a ./rust)
-    gcc
-    lld
-    clang
-    pkgs.unstable.mold
-    rust-analyzer-nightly
-    (inputs.fenix.packages.${pkgs.system}.complete.withComponents [
-      "cargo"
-      "clippy"
-      "rust-src"
-      "rustc"
-      "rustfmt"
-    ])
+    # gcc
+    # lld
+    # clang
+    # unstable.mold # not sure this works with a nix-shell
+    # rust-analyzer-nightly
+    # (inputs.fenix.packages.${pkgs.system}.complete.withComponents [
+    # "cargo"
+    # "clippy"
+    # "rust-src"
+    # "rustc"
+    # "rustfmt"
+    # ])
+
+    # iphone
+    libimobiledevice
+    ifuse # allows mounting over iPhone
+
+    # Videoplayer
+    vlc
+
+    # Audio Recording
+    audacity
 
     # Notifications
     dunst
+
+    unstable.rmg # n64 emu
+
+    # Nvim
+    neovide
+    neovim
+    lunarvim
+
+    # 1password setup
+    _1password
+    _1password-gui
+    git-credential-1password
 
     unar
     poppler
     ffmpegthumbnailer
     fd
     firefox
+    ungoogled-chromium
+    google-chrome
+    chromium
     git
     nerdfonts
     helix
@@ -237,6 +275,28 @@
     nil
     dmenu-rs
   ];
+
+  environment.gnome.excludePackages =
+    (with pkgs; [
+      gnome-photos
+      gnome-tour
+    ])
+    ++ (with pkgs.gnome; [
+      cheese # webcam tool
+      gnome-music
+      gnome-terminal
+      gedit # text editor
+      epiphany # web browser
+      geary # email reader
+      evince # document viewer
+      gnome-characters
+      totem # video player
+      tali # poker game
+      iagno # go game
+      hitori # sudoku game
+      atomix # puzzle game
+    ]);
+
   programs.zsh.enable = true;
 
   home-manager = {
@@ -284,7 +344,6 @@
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

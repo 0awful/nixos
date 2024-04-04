@@ -12,6 +12,7 @@
     # ./hyprland
     # ./nusheel
     # ./alacritty.nix
+    # ./firefox #Broken. no NUR and colliding configs
     ./wezterm
     ./rice
     ./yazi
@@ -19,6 +20,7 @@
     ./zsh
     ./discord # For discord settings
     ./cargo # Similarly cargo settings
+    ./nvim
   ];
 
   nixpkgs = {
@@ -71,12 +73,17 @@
     extraConfig = {
       init.defaultBranch = "main";
       core = {
-        editor = "hx";
+        editor = "neovide";
         autocrlf = "input";
       };
       pull.rebase = true;
       rebase.autoStash = true;
     };
+  };
+
+  dconf = {
+    enable = true;
+    settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
   };
 
   # Nicely reload system units when changing configs

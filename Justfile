@@ -4,6 +4,9 @@
 #
 ##########################################################################
 
+apply:
+  nixos-rebuild switch --flake .#guest --use-remote-sudo
+
 format:
   nix fmt
 
@@ -12,9 +15,6 @@ fmt:
 
 init:
   echo "this isn't implemented, but should run the commands to enable nixos to first time execute this program"
-
-apply:
-  nixos-rebuild switch --flake .#guest --use-remote-sudo
 
 debug:
   nixos-rebuild switch --flake .#guest --show-trace --verbose --use-remote-sudo
