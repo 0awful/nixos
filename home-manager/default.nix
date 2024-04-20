@@ -8,7 +8,7 @@
 }: {
   # You can import other home-manager modules here
   imports = [
-    ./helix.nix
+    # ./helix.nix
     # ./hyprland
     # ./nusheel
     # ./alacritty.nix
@@ -75,7 +75,7 @@
     extraConfig = {
       init.defaultBranch = "main";
       core = {
-        editor = "neovide";
+        editor = "lvim";
         autocrlf = "input";
       };
       pull.rebase = true;

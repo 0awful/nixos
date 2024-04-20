@@ -98,8 +98,8 @@
     "1.1.1.1"
     "9.9.9.9"
   ];
-  networking.wireless.enable = true; # Enables wireless support via wpa_supplicant.
 
+  networking.wireless.enable = true; # Enables wireless support via wpa_supplicant.
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -174,7 +174,7 @@
 
   environment.variables = {
     SHELL = "zsh";
-    EDITOR = "nvim";
+    EDITOR = "lvim";
     TERMINAL = "wezterm";
     BROWSER = "firefox";
   };
@@ -198,6 +198,9 @@
     layout = "us";
   };
 
+  # Mozilla Vpn
+  services.mozillavpn.enable = true;
+
   # Enable the 1Password CLI, this also enables a SGUID wrapper so the CLI can authorize against the GUI app
   programs._1password = {
     enable = true;
@@ -212,20 +215,6 @@
 
 
   environment.systemPackages = with pkgs; [
-    # Rust (I'd love this to be a ./rust)
-    # gcc
-    # lld
-    # clang
-    # unstable.mold # not sure this works with a nix-shell
-    # rust-analyzer-nightly
-    # (inputs.fenix.packages.${pkgs.system}.complete.withComponents [
-    # "cargo"
-    # "clippy"
-    # "rust-src"
-    # "rustc"
-    # "rustfmt"
-    # ])
-
     # iphone
     libimobiledevice
     ifuse # allows mounting over iPhone
@@ -239,14 +228,17 @@
     # Notifications
     dunst
 
-    unstable.rmg # n64 emu
+    # n64 emu
+    unstable.rmg
 
     # Nvim
     neovide
-    neovim
+    # neovim
     lunarvim
 
-
+    ## Unorg
+    ## --------------
+    lazygit
     unar
     poppler
     ffmpegthumbnailer
@@ -283,7 +275,17 @@
     bacon
     nil
     dmenu-rs
+    ## Unorg end ----------    
   ];
+
+  
+
+
+programs.steam = {
+  enable = true;
+  remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+  dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+};
 
   environment.gnome.excludePackages =
     (with pkgs; [
