@@ -27,7 +27,6 @@ ueberzug_offset = [ 0, 0, 0, 0 ]
 edit = [
 # TODO: Go back to this once I can get $EDITOR to update correctly
 	{ exec = '$EDITOR "$@"', block = true,  for = "unix" },
-	# { exec = 'lvim "$@"', block = true, for = "unix" }
 	{ exec = 'code "%*"',    orphan = true, for = "windows" },
 ]
 open = [

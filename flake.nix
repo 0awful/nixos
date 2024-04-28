@@ -14,14 +14,14 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     # Rust from Fenix.
-    fenix = {
-      url = "github:nix-community/fenix/monthly";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
+    # fenix = {
+    #   url = "github:nix-community/fenix/monthly";
+    #   inputs.nixpkgs.follows = "nixpkgs-unstable";
+    # };
 
-    nur = {
-      url = "github:nix-community/NUR";
-    };
+    # nur = {
+    #   url = "github:nix-community/NUR";
+    # };
     # TODO: Add any other flake you might need
     # hardware.url = "github:nixos/nixos-hardware";
 
@@ -33,7 +33,7 @@
   outputs = {
     self,
     nixpkgs,
-    fenix,
+    # fenix,
     home-manager,
     ...
   } @ inputs: let
@@ -73,7 +73,7 @@
         modules = [
           # > Our main nixos configuration file <
           ./nixos/configuration.nix
-          inputs.nur.nixosModules.nur
+          # inputs.nur.nixosModules.nur
         ];
       };
     };

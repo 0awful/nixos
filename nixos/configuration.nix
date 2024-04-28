@@ -55,7 +55,7 @@
       outputs.overlays.additions
       outputs.overlays.modifications
       outputs.overlays.unstable-packages
-      inputs.fenix.overlays.default
+      # inputs.fenix.overlays.default
 
       # You can also add overlays exported from other flakes:
       # neovim-nightly-overlay.overlays.default
@@ -178,15 +178,17 @@
     TERMINAL = "wezterm";
     BROWSER = "firefox";
   };
-  users.users = {
-    guest = {
+  users = {
+    defaultUserShell = pkgs.zsh;
+    users = {
+      guest = {
       initialPassword = "guest";
       isNormalUser = true;
       openssh.authorizedKeys.keys = [
       ];
-      shell = pkgs.zsh;
       extraGroups = ["wheel" "networkmanager" "docker"];
     };
+  };
   };
 
   # Enable automatic login for the user.
@@ -213,6 +215,7 @@
   };    # 1password setup
   # programs._1password-cli.enable = true;
 
+  programs.zsh.enable = true;
 
   environment.systemPackages = with pkgs; [
     # iphone
@@ -255,7 +258,7 @@
     xclip
     gh
     eza
-    zsh-powerlevel10k
+    # zsh-powerlevel10k Disabled because homemanager should handle
     ripgrep
     ripgrep-all
     speedtest-rs
@@ -308,7 +311,6 @@ programs.steam = {
       atomix # puzzle game
     ]);
 
-  programs.zsh.enable = true;
 
   home-manager = {
     extraSpecialArgs = {inherit inputs outputs;};

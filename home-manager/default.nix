@@ -6,13 +6,10 @@
   # lib,
   ...
 }: {
-  # You can import other home-manager modules here
+  programs.home-manager.enable = true;
+
+# pull in the things from folders. Grabs default.nix if a folder is given
   imports = [
-    # ./helix.nix
-    # ./hyprland
-    # ./nusheel
-    # ./alacritty.nix
-    # ./firefox #Broken. no NUR and colliding configs
     ./wezterm
     ./rice
     ./yazi
@@ -22,8 +19,11 @@
     ./cargo # Similarly cargo settings
     ./nvim
     ./1password # for ssh key management
-    # ./git # gitconfig
+    ./direnv # faster nix dev
   ];
+	# I am not importing all the folders because I don't use all the things, but I want to be able to return to them. 
+	# The configs live on, but are not a part of the system
+
 
   nixpkgs = {
     overlays = [
@@ -61,9 +61,9 @@
     steam
   ];
 
+  # todo: break this out into a git file
   programs.gh.enable = true;
 
-  programs.home-manager.enable = true;
   programs.git = {
     enable = true;
     ignores = ["*.swp"];
