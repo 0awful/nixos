@@ -31,7 +31,7 @@
     options = "--delete-older-than 3d";
   };
 
-  # You can import other NixOS modules here
+ 
   imports = [
     inputs.home-manager.nixosModules.home-manager
     # If you want to use modules your own flake exports (from modules/nixos):
@@ -114,6 +114,10 @@
   # Enable iphone
   services.usbmuxd.enable = true;
 
+  # Mount some devices
+  services.gvfs.enable = true; 
+    services.udisks2.enable = true;
+    services.devmon.enable = true;
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";
 
@@ -234,10 +238,15 @@
     # n64 emu
     unstable.rmg
 
+    # gamecube/wii emu
+    dolphin-emu
+
     # Nvim
     neovide
     # neovim
     lunarvim
+
+    pcmanfm
 
     ## Unorg
     ## --------------

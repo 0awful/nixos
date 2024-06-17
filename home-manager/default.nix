@@ -17,7 +17,7 @@
     ./zsh
     ./discord # For discord settings
     ./cargo # Similarly cargo settings
-    ./nvim
+    #./nvim We don't use this at the moment because we use lunarvim
     ./1password # for ssh key management
     ./direnv # faster nix dev
   ];
