@@ -13,12 +13,10 @@
     home-manager.url = "github:nix-community/home-manager/release-23.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    # Rust from Fenix.
-    # fenix = {
-    #   url = "github:nix-community/fenix/monthly";
-    #   inputs.nixpkgs.follows = "nixpkgs-unstable";
-    # };
-
+    nixvim = {
+      url = "github:nix-community/nixvim/nixos-23.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # nur = {
     #   url = "github:nix-community/NUR";
     # };
@@ -33,8 +31,8 @@
   outputs = {
     self,
     nixpkgs,
-    # fenix,
     home-manager,
+    # nixvim,
     ...
   } @ inputs: let
     inherit (self) outputs;

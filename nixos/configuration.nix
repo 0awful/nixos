@@ -31,9 +31,10 @@
     options = "--delete-older-than 3d";
   };
 
- 
   imports = [
     inputs.home-manager.nixosModules.home-manager
+
+    inputs.nixvim.nixosModules.nixvim
     # If you want to use modules your own flake exports (from modules/nixos):
     # outputs.nixosModules.example
 
@@ -55,7 +56,6 @@
       outputs.overlays.additions
       outputs.overlays.modifications
       outputs.overlays.unstable-packages
-      # inputs.fenix.overlays.default
 
       # You can also add overlays exported from other flakes:
       # neovim-nightly-overlay.overlays.default
@@ -115,9 +115,9 @@
   services.usbmuxd.enable = true;
 
   # Mount some devices
-  services.gvfs.enable = true; 
-    services.udisks2.enable = true;
-    services.devmon.enable = true;
+  services.gvfs.enable = true;
+  services.udisks2.enable = true;
+  services.devmon.enable = true;
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";
 
@@ -178,7 +178,7 @@
 
   environment.variables = {
     SHELL = "zsh";
-    EDITOR = "lvim";
+    EDITOR = "neovide";
     TERMINAL = "wezterm";
     BROWSER = "firefox";
   };
@@ -186,13 +186,13 @@
     defaultUserShell = pkgs.zsh;
     users = {
       guest = {
-      initialPassword = "guest";
-      isNormalUser = true;
-      openssh.authorizedKeys.keys = [
-      ];
-      extraGroups = ["wheel" "networkmanager" "docker"];
+        initialPassword = "guest";
+        isNormalUser = true;
+        openssh.authorizedKeys.keys = [
+        ];
+        extraGroups = ["wheel" "networkmanager" "docker"];
+      };
     };
-  };
   };
 
   # Enable automatic login for the user.
@@ -216,10 +216,102 @@
   programs._1password-gui = {
     enable = true;
     polkitPolicyOwners = ["guest"];
-  };    # 1password setup
+  }; # 1password setup
   # programs._1password-cli.enable = true;
 
   programs.zsh.enable = true;
+
+  programs.nixvim = {
+    enable = true;
+
+    globals.mapleader = " ";
+
+    options = {
+      number = true;
+      relativenumber = true;
+      shiftwidth = 2;
+    };
+
+    plugins = {
+      lightline.enable = true;
+      lsp = {
+        enable = true;
+
+        servers = {
+          tsserver.enable = true;
+
+          lua-ls = {
+            enable = true;
+            settings.telemetry.enable = false;
+          };
+          rust-analyzer = {
+            enable = true;
+            installCargo = true;
+            # I think this means it'll use dev shell rustc
+            installRustc = false;
+          };
+        };
+      };
+      nvim-cmp = {
+        enable = true;
+        autoEnableSources = true;
+        sources = [
+          {name = "nvim_lsp";}
+          {name = "path";}
+          {name = "buffer";}
+          {name = "luasnip";}
+        ];
+
+        mapping = {
+          "<CR>" = "cmp.mapping.confirm({ select = true })";
+          "<Tab>" = {
+            action = ''
+              function(fallback)
+                if cmp.visible() then
+                  cmp.select_next_item()
+                elseif luasnip.expandable() then
+                  luasnip.expand()
+                elseif luasnip.expand_or_jumpable() then
+                  luasnip.expand_or_jump()
+                elseif check_backspace() then
+                  fallback()
+                else
+                  fallback()
+                end
+              end
+            '';
+            modes = ["i" "s"];
+          };
+        };
+      };
+      # parsing and other magic
+      treesitter.enable = true;
+      # $ nvim . will open oil instead of netrw
+      oil.enable = true;
+      telescope.enable = true;
+      luasnip.enable = true;
+    };
+
+    extraPlugins = with pkgs.vimPlugins; [
+      {
+        plugin = comment-nvim;
+        config = "lua require(\"Comment\").setup()";
+      }
+    ];
+    highlight = {
+      #Comment.fg = "#ff00ff";
+      #Comment.bg = "#000000";
+      Comment.underline = true;
+      Comment.bold = true;
+    };
+    keymaps = [
+      {
+        action = "<cmd>Telescope live_grep<CR>";
+        key = "<leader>g";
+      }
+    ];
+    colorschemes.gruvbox.enable = true;
+  };
 
   environment.systemPackages = with pkgs; [
     # iphone
@@ -287,17 +379,14 @@
     bacon
     nil
     dmenu-rs
-    ## Unorg end ----------    
+    ## Unorg end ----------
   ];
 
-  
-
-
-programs.steam = {
-  enable = true;
-  remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-  dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
-};
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+  };
 
   environment.gnome.excludePackages =
     (with pkgs; [
@@ -319,7 +408,6 @@ programs.steam = {
       hitori # sudoku game
       atomix # puzzle game
     ]);
-
 
   home-manager = {
     extraSpecialArgs = {inherit inputs outputs;};

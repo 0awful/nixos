@@ -47,7 +47,7 @@
       alias grep=rg
       alias vi=lvim
       alias vim=lvim
-      alias nvim=lvim
+      # alias nvim=lvim
       alias godot=godot4
     '';
   };

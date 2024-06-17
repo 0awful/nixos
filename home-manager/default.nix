@@ -8,7 +8,7 @@
 }: {
   programs.home-manager.enable = true;
 
-# pull in the things from folders. Grabs default.nix if a folder is given
+  # pull in the things from folders. Grabs default.nix if a folder is given
   imports = [
     ./wezterm
     ./rice
@@ -20,10 +20,10 @@
     #./nvim We don't use this at the moment because we use lunarvim
     ./1password # for ssh key management
     ./direnv # faster nix dev
+    # ./nixvim
   ];
-	# I am not importing all the folders because I don't use all the things, but I want to be able to return to them. 
-	# The configs live on, but are not a part of the system
-
+  # I am not importing all the folders because I don't use all the things, but I want to be able to return to them.
+  # The configs live on, but are not a part of the system
 
   nixpkgs = {
     overlays = [
@@ -75,7 +75,7 @@
     extraConfig = {
       init.defaultBranch = "main";
       core = {
-        editor = "lvim";
+        editor = "neovide";
         autocrlf = "input";
       };
       pull.rebase = true;
