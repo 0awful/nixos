@@ -43,3 +43,5 @@ gc:
 #
 ##########################################################################
 
+astro:
+  git clone --depth 1 https://github.com/AstroNvim/template ./home-manager/astro-nvim && rm -rf ./home-manager/astro-nvim/.git
