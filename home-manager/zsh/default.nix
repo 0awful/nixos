@@ -45,9 +45,9 @@
       alias cd=z
       alias ls=eza
       alias grep=rg
-      alias vi=lvim
-      alias vim=lvim
-      alias nvim=lvim
+      alias vi=nvim
+      alias vim=nvim
+      alias nvim=nvim
       alias godot=godot4
     '';
   };

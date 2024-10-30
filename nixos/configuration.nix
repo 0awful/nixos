@@ -99,20 +99,37 @@
     "9.9.9.9"
   ];
 
-  networking.wireless.enable = true; # Enables wireless support via wpa_supplicant.
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+networking = {
+  wireless.enable = false;
+  networkmanager = {
+    enable = true;
+    wifi.backend = "iwd";
+  };
+};
 
-  # networking.networkmanager.enable = true;
-  # networking.firewall.enable = false;
-  # networking.networkmanager.firewall.enable = false;
 
-  # Enable networking
-  services.connman.enable = true;
+# Add IWD service with specific config for Intel cards
+services.iwd = {
+  enable = true;
+  settings = {
+    General = {
+      AddressRandomization = "none";
+      EnableNetworkConfiguration = false;  # Let NetworkManager handle this
+    };
+    Network = {
+      EnableIPv6 = true;
+      RoutePriorityOffset = 300;
+      KeyringAccessible = true;
+    };
+  };
+};
+# Disable connman
+services.connman.enable = false;
 
-  # Enable iphone
-  services.usbmuxd.enable = true;
+# Make sure firmware is available
+hardware.enableAllFirmware = true;
+
+services.usbmuxd.enable = true;
 
   # Mount some devices
   services.gvfs.enable = true;
@@ -221,91 +238,17 @@
 
   programs.zsh.enable = true;
 
-  programs.nixvim = {
-    enable = true;
+   environment.systemPackages = with pkgs; [
+  networkmanager
+  networkmanagerapplet
+  iw
+  pciutils
+  usbutils
+  ethtool
+  linux-firmware
+  tcpdump
+  wavemon
 
-    globals.mapleader = " ";
-
-    options = {
-      clipboard = "unnamedplus";
-      number = true;
-      relativenumber = true;
-      shiftwidth = 2;
-    };
-
-    plugins = {
-      lightline.enable = true;
-      lsp = {
-        enable = true;
-
-        servers = {
-          tsserver.enable = true;
-
-          lua-ls = {
-            enable = true;
-            settings.telemetry.enable = false;
-          };
-          rust-analyzer = {
-            enable = true;
-            installCargo = true;
-            # I think this means it'll use dev shell rustc
-            installRustc = false;
-          };
-        };
-      };
-      nvim-cmp = {
-        enable = true;
-        autoEnableSources = true;
-        sources = [
-          {name = "nvim_lsp";}
-          {name = "path";}
-          {name = "buffer";}
-        ];
-	mapping = {
-	  "<CR>" = "cmp.mapping.confirm({ select = true })";
-	  "<Tab>" = {
-	    action = ''
-	      function(fallback)
-		if cmp.visible() then
-		  cmp.select_next_item()
-		else
-		  fallback()
-		end
-	      end
-	    '';
-	  };
-	};
-      };
-      # parsing and other magic
-      treesitter.enable = true;
-      # $ nvim . will open oil instead of netrw
-      oil.enable = true;
-      telescope.enable = true;
-      luasnip.enable = true;
-    };
-
-    extraPlugins = with pkgs.vimPlugins; [
-      {
-        plugin = comment-nvim;
-        config = "lua require(\"Comment\").setup()";
-      }
-    ];
-    highlight = {
-      #Comment.fg = "#ff00ff";
-      #Comment.bg = "#000000";
-      Comment.underline = true;
-      Comment.bold = true;
-    };
-    keymaps = [
-      {
-        action = "<cmd>Telescope live_grep<CR>";
-        key = "<leader>g";
-      }
-    ];
-    colorschemes.gruvbox.enable = true;
-  };
-
-  environment.systemPackages = with pkgs; [
     # iphone
     libimobiledevice
     ifuse # allows mounting over iPhone
@@ -328,7 +271,6 @@
     # Nvim
     neovide
     # neovim
-    lunarvim
 
     pcmanfm
 
