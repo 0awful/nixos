@@ -1,4 +1,5 @@
 [user]
 	email = im.izaac.seo@gmail.com
 	name = 0awful
- 
+[push] 
+	autoSetupRemote = true

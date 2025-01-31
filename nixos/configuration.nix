@@ -100,33 +100,49 @@
   ];
 
 networking = {
-  wireless.enable = false;
+  wireless.enable = true;
   networkmanager = {
-    enable = true;
-    wifi.backend = "iwd";
+    enable = false;
+    wifi = {
+      powersave = false;
+      macAddress = "preserve";
+    };
+    logLevel = "DEBUG";
   };
 };
+# System-wide power management settings
+powerManagement = {
+  enable = true;  # Keep enabled but configure for performance
+  cpuFreqGovernor = "performance";  # Always run CPU at full speed
+};
 
+# Disable various power management services
+services.power-profiles-daemon.enable = false;  # Disable power profiles
+services.tlp.enable = false;  # Disable TLP if it's enabled
+services.thermald.enable = false;  # Disable Intel's thermal daemon
 
-# Add IWD service with specific config for Intel cards
-services.iwd = {
+# Add kernel parameters to disable more power saving features
+boot.kernelParams = [
+  "intel_idle.max_cstate=1"  # Limit CPU power saving states
+  "pcie_aspm=off"  # Disable PCIe power saving
+];
+
+services.connman = {
   enable = true;
-  settings = {
-    General = {
-      AddressRandomization = "none";
-      EnableNetworkConfiguration = false;  # Let NetworkManager handle this
-    };
-    Network = {
-      EnableIPv6 = true;
-      RoutePriorityOffset = 300;
-      KeyringAccessible = true;
-    };
-  };
-};
-# Disable connman
-services.connman.enable = false;
-
-# Make sure firmware is available
+  extraConfig = ''
+    [General]
+    AllowHostnameUpdates=false
+    PreferredTechnologies=wifi,ethernet
+    # Disable WiFi power saving
+    WiFiPowerSave=off
+    
+    [WiFi]
+    # Disable internal WiFi power management
+    DisablePowerManagement=true
+    # Disable periodic scans when connected
+    DisablePeriodicScan=true
+  '';
+};# Make sure firmware is available
 hardware.enableAllFirmware = true;
 
 services.usbmuxd.enable = true;
@@ -239,6 +255,7 @@ services.usbmuxd.enable = true;
   programs.zsh.enable = true;
 
    environment.systemPackages = with pkgs; [
+  # networking tools
   networkmanager
   networkmanagerapplet
   iw
@@ -248,6 +265,12 @@ services.usbmuxd.enable = true;
   linux-firmware
   tcpdump
   wavemon
+
+  # Connman tools
+  cmst
+  connman-gtk
+  connman-ncurses
+
 
     # iphone
     libimobiledevice
@@ -276,6 +299,8 @@ services.usbmuxd.enable = true;
 
     ## Unorg
     ## --------------
+    unstable.godot_4
+    tree
     lazygit
     unar
     poppler

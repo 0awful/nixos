@@ -64,7 +64,6 @@
     # game dev
     unstable.ldtk
     blender
-    unstable.godot_4
     # steam
     steam
   ];
