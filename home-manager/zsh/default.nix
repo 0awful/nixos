@@ -49,6 +49,8 @@
       alias vim=nvim
       alias nvim=nvim
       alias godot=godot4
+      alias ffs='~/scripts/ffs.sh'
+      alias FFS='~/scripts/ffs.sh'
     '';
   };
   programs.zoxide = {
