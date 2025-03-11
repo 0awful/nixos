@@ -57,9 +57,6 @@
       outputs.overlays.modifications
       outputs.overlays.unstable-packages
 
-      # You can also add overlays exported from other flakes:
-      # neovim-nightly-overlay.overlays.default
-
       # Or define it inline, for example:
       # (final: prev: {
       #   hi = final.hello.overrideAttrs (oldAttrs: {
@@ -211,7 +208,6 @@ services.usbmuxd.enable = true;
 
   environment.variables = {
     SHELL = "zsh";
-    EDITOR = "neovide";
     TERMINAL = "wezterm";
     BROWSER = "firefox";
   };
@@ -291,9 +287,6 @@ services.usbmuxd.enable = true;
     # gamecube/wii emu
     dolphin-emu
 
-    # Nvim
-    neovide
-    # neovim
 
     pcmanfm
 

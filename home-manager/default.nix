@@ -17,21 +17,14 @@
     ./zsh
     ./discord # For discord settings
     ./cargo # Similarly cargo settings
-    ./nvim #We don't use this at the moment because we use lunarvim
+    # ./nvim 
     ./1password # for ssh key management
     ./direnv # faster nix dev
+    ./astro
     # ./nixvim
   ];
   # I am not importing all the folders because I don't use all the things, but I want to be able to return to them.
   # The configs live on, but are not a part of the system
-
-
-  # This sets up astro-nvim
-  home.file.".config/nvim" = {
-    source = ./astro-nvim;
-    recursive = true;
-  };
-
 
   nixpkgs = {
     overlays = [
