@@ -6,7 +6,7 @@
   programs.zsh = {
     enable = true;
     autocd = false;
-    # dotDir = ".config/zsh";
+    dotDir = ".config/zsh";
     # plugins = [
     #   {
     #     name = "powerlevel10k";
@@ -27,11 +27,15 @@
       export PATH=$HOME/.cargo/bin:$PATH
       export PATH=$HOME/.local/share/bin:$PATH
 
+      # have things find fonts
+      export FONTCONFIG_FILE=/etc/fonts/fonts.conf
+      export FONTCONFIG_PATH=/etc/fonts
+
       # Remove history data we don't want to see
       export HISTIGNORE="pwd:ls:cd"
 
       # export ALTERNATE_EDITOR=""
-      # export EDITOR="emacsclient -t"
+      export EDITOR="emacsclient -t"
       # export VISUAL="emacsclient -c -a emacs"
 
       # nix shortcuts
@@ -45,9 +49,8 @@
       alias cd=z
       alias ls=eza
       alias grep=rg
-      alias vi=nvim
-      alias vim=nvim
-      alias nvim=nvim
+      alias vi=$EDITOR
+      alias vim=$EDITOR
       alias godot=godot4
       alias ffs='~/scripts/ffs.sh'
       alias FFS='~/scripts/ffs.sh'
@@ -59,9 +62,6 @@
   };
   programs.starship = {
     enable = true;
-    enableZshIntegration = true;
-  };
-  programs.yazi = {
     enableZshIntegration = true;
   };
 }

@@ -132,7 +132,7 @@ services.connman = {
     PreferredTechnologies=wifi,ethernet
     # Disable WiFi power saving
     WiFiPowerSave=off
-    
+
     [WiFi]
     # Disable internal WiFi power management
     DisablePowerManagement=true
@@ -249,8 +249,12 @@ services.usbmuxd.enable = true;
   # programs._1password-cli.enable = true;
 
   programs.zsh.enable = true;
+  # set up nerdfonts
+  fonts.packages = with pkgs; [ nerdfonts ];
+   fonts.fontDir.enable = true;
 
-   environment.systemPackages = with pkgs; [
+
+environment.systemPackages = with pkgs; [
   # networking tools
   networkmanager
   networkmanagerapplet
@@ -304,7 +308,6 @@ services.usbmuxd.enable = true;
     google-chrome
     chromium
     git
-    nerdfonts
     helix
     linuxKernel.packages.linux_6_1.virtualboxGuestAdditions
     inputs.home-manager.packages.${pkgs.system}.default

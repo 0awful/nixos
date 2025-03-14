@@ -3,21 +3,41 @@
 {
   outputs,
   pkgs,
-  # lib,
   ...
 }: {
+  # let home-manager control itself
   programs.home-manager.enable = true;
+  # let home-manager help programs find fonts (technically manage your font config)
+  fonts = {
+    fontconfig.enable = true;
+  };
+
+  # You'll never be upset to have an editorconfig
+  editorconfig = {
+    enable = true;
+    settings = {
+      "*" = {
+        charset = "utf-8";
+        end_of_line = "lf";
+        trim_trailing_whitespace = true;
+        insert_final_newline = true;
+        max_line_width = 78;
+        indent_style = "space";
+        indent_size = 2;
+      };
+    };
+  };
 
   # pull in the things from folders. Grabs default.nix if a folder is given
   imports = [
     ./wezterm
     ./rice
-    ./yazi
     ./gitui
     ./zsh
+    ./emacs
     ./discord # For discord settings
     ./cargo # Similarly cargo settings
-    # ./nvim 
+    # ./nvim
     ./1password # for ssh key management
     ./direnv # faster nix dev
     ./astro
@@ -59,6 +79,9 @@
     blender
     # steam
     steam
+
+    # Fonts seem to be a nightmare...
+    nerdfonts
   ];
 
   # todo: break this out into a git file
@@ -75,7 +98,7 @@
     extraConfig = {
       init.defaultBranch = "main";
       core = {
-        editor = "neovide";
+        editor = "emacs";
         autocrlf = "input";
       };
       pull.rebase = true;
