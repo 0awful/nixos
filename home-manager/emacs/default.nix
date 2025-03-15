@@ -21,6 +21,12 @@
       epkgs.gruvbox-theme
       epkgs.nix-mode
       epkgs.sudo-edit
+      epkgs.ivy
+      epkgs.ivy-rich
+      epkgs.counsel
+      epkgs.all-the-icons-ivy-rich
+      epkgs.all-the-icons
+      epkgs.all-the-icons-dired
     ];
   };
 

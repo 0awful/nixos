@@ -250,7 +250,10 @@ services.usbmuxd.enable = true;
 
   programs.zsh.enable = true;
   # set up nerdfonts
-  fonts.packages = with pkgs; [ nerdfonts ];
+  fonts.packages = with pkgs; [
+    nerdfonts
+    emacs-all-the-icons-fonts
+];
    fonts.fontDir.enable = true;
 
 
