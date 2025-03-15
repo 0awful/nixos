@@ -12,6 +12,7 @@
   - [[#buffer-move][Buffer move]]
   - [[#clipboard-etiquette][Clipboard etiquette]]
 - [[#all-the-icons][All The Icons]]
+- [[#avy][Avy]]
 - [[#fonts][FONTS]]
 - [[#graphical-user-interface-tweaks][GRAPHICAL USER INTERFACE TWEAKS]]
   - [[#gruvbox-theme][Gruvbox Theme]]
@@ -63,7 +64,7 @@
 
        (bb/leader-keys
          "." '(find-file :wk "Find File")
-   "f r" '(counsel-recentf :wk "Find recent files")
+   "l r" '(counsel-recentf :wk "Find recent files")
          "TAB TAB" '(comment-line :wk "Comment Lines"))
 
        (bb/leader-keys
@@ -355,6 +356,20 @@ The icon set that is all the icons
 
   (use-package all-the-icons-dired
     :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
+#+end_src
+
+* Avy
+#+begin_src emacs-lisp
+    (use-package avy
+    :config
+         (bb/leader-keys
+           "f" '(:ignore t :wk "jump")
+           "f f" '(avy-goto-char-timer :wk "Avy goto")
+           "f l" '(avy-goto-line :wk "Avy goto line")
+           "f w" '(avy-goto-word-2 :wk "Avy goto word")
+           "f c" '(avy-goto-char-2 :wk "Avy goto char")
+  )
+  )
 #+end_src
 
 * FONTS
