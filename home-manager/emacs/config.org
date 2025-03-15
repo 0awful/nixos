@@ -3,12 +3,14 @@
 #+DESCRIPTION: Yoinked from DT's personal Emacs config. Built into this.
 #+STARTUP: showeverything
 #+OPTIONS: toc:2
-
 * TABLE OF CONTENTS :toc:
 - [[#important-programs-to-load-first][IMPORTANT PROGRAMS TO LOAD FIRST]]
   - [[#load-evil-mode][Load Evil Mode]]
   - [[#general-keybindings][General Keybindings]]
+  - [[#custom-k-behavior][Custom K behavior]]
+  - [[#custom-c-u][Custom C-u]]
   - [[#buffer-move][Buffer move]]
+  - [[#clipboard-etiquette][Clipboard etiquette]]
 - [[#all-the-icons][All The Icons]]
 - [[#fonts][FONTS]]
 - [[#graphical-user-interface-tweaks][GRAPHICAL USER INTERFACE TWEAKS]]
@@ -19,6 +21,7 @@
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-bullets][Enabling Org Bullets]]
   - [[#org-tempo-better-src-block-input][Org Tempo (better src block input)]]
+  - [[#org-tempo-custom-templates][Org tempo custom templates]]
   - [[#org-mode-indent-fix][Org mode indent fix]]
   - [[#better-gruvbox-org-mode][Better gruvbox org mode]]
 - [[#which-key][WHICH-KEY]]
@@ -107,7 +110,48 @@
    "w K" '(buf-move-up :wk "Move window up")
    "w J" '(buf-move-down :wk "Move window down")
    )
+
   )
+#+end_src
+** Custom K behavior
+#+begin_src emacs-lisp
+(define-key evil-normal-state-map (kbd "K")
+  (lambda ()
+    (interactive)
+    (cond
+     ;; If at a link in org-mode or similar
+     ((and (boundp 'org-mode) org-mode (org-at-link-p))
+      (org-open-at-point))
+     
+     ;; If using LSP for code navigation
+     ((and (fboundp 'lsp-find-definition)
+           (bound-and-true-p lsp-mode))
+      (lsp-find-definition))
+     
+     ;; Fallback to xref (works with many modes)
+     ((fboundp 'xref-find-definitions)
+      (xref-find-definitions (thing-at-point 'symbol)))
+     
+     ;; Last resort, try the original K behavior
+     (t (evil-lookup))))
+#+end_src
+
+** Custom C-u
+#+begin_src emacs-lisp
+;; Make C-u consistently scroll up in all evil modes
+(with-eval-after-load 'evil
+  ;; Unbind C-u from universal-argument
+  (global-set-key (kbd "C-u") nil)
+  
+  ;; Bind C-u to evil-scroll-up in all states
+  (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
+  (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
+  (define-key evil-insert-state-map (kbd "C-u") 'evil-scroll-up)
+  (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up)
+  (define-key evil-emacs-state-map (kbd "C-u") 'evil-scroll-up))
+
+;; Optional: remap universal-argument to something else if you still need it
+;; (global-set-key (kbd "C-M-u") 'universal-argument)
 #+end_src
 
 ** Buffer move
@@ -290,6 +334,17 @@ any other key exits this function."
     (set-transient-map map t)))
 #+end_src
 
+** Clipboard etiquette
+| action                  | command |
+| Copy to system keyboard | "+y     |
+| Paste from system keyboard | "+p |
+| Cut to system keyboard | "+d |
+#+begin_src emacs-lisp
+  (setq select-enable-clipboard nil)  ;; Prevents automatic clipboard copy
+  (setq select-enable-primary nil)    ;; Stops Emacs from using primary selection
+
+  (setq evil-visual-update-x-selection nil) ;; Visual selection doesn't go to clipboard by default
+#+end_src
 * All The Icons
 The icon set that is all the icons
 
@@ -336,7 +391,6 @@ Defining the various fonts that Emacs will use.
 
 #+end_src
 
-
 * GRAPHICAL USER INTERFACE TWEAKS
 Let's make GNU Emacs look a little better.
 ** Gruvbox Theme
@@ -380,7 +434,22 @@ Org-bullets gives us attractive bullets rather than asterisks.
 #+begin_src emacs-lisp
   (require 'org-tempo)
 #+end_src
+** Org tempo custom templates
 
+#+begin_src emacs-lisp
+      (with-eval-after-load 'org-tempo
+      (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp"))
+    ;; rust
+      (add-to-list 'org-structure-template-alist '("sr" . "src rust"))
+      (add-to-list 'org-structure-template-alist '("er" . "example rust"))
+  ;; js
+      (add-to-list 'org-structure-template-alist '("sj" . "src js"))
+      (add-to-list 'org-structure-template-alist '("ej" . "example js"))
+    ;; svelte
+      (add-to-list 'org-structure-template-alist '("ss" . "src svelte"))
+      (add-to-list 'org-structure-template-alist '("es" . "example svelte"))
+    )
+#+end_src
 ** Org mode indent fix
 #+begin_src emacs-lisp
   (electric-indent-mode -1)
