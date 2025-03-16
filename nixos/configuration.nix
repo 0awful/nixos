@@ -97,7 +97,15 @@
   ];
 
 networking = {
-  wireless.enable = true;
+  wireless = {
+    enable = true;
+    userControlled.enable = true;
+    extraConfig = ''
+                ctrl_interface=/run/wpa_supplicant
+                ctrl_interface_group=wheel
+                update_config=1
+    '';
+  };
   networkmanager = {
     enable = false;
     wifi = {
@@ -107,6 +115,25 @@ networking = {
     logLevel = "DEBUG";
   };
 };
+services.connman = {
+  enable = true;
+  extraConfig = ''
+    [General]
+    AllowHostnameUpdates=false
+    PreferredTechnologies=wifi,ethernet
+    # Disable WiFi power saving
+    WiFiPowerSave=off
+
+    [WiFi]
+    # Disable internal WiFi power management
+    DisablePowerManagement=true
+    # Disable periodic scans when connected
+    DisablePeriodicScan=true
+  '';
+};
+
+# Make sure firmware is available
+hardware.enableAllFirmware = true;
 # System-wide power management settings
 powerManagement = {
   enable = true;  # Keep enabled but configure for performance
@@ -123,24 +150,6 @@ boot.kernelParams = [
   "intel_idle.max_cstate=1"  # Limit CPU power saving states
   "pcie_aspm=off"  # Disable PCIe power saving
 ];
-
-services.connman = {
-  enable = true;
-  extraConfig = ''
-    [General]
-    AllowHostnameUpdates=false
-    PreferredTechnologies=wifi,ethernet
-    # Disable WiFi power saving
-    WiFiPowerSave=off
-
-    [WiFi]
-    # Disable internal WiFi power management
-    DisablePowerManagement=true
-    # Disable periodic scans when connected
-    DisablePeriodicScan=true
-  '';
-};# Make sure firmware is available
-hardware.enableAllFirmware = true;
 
 services.usbmuxd.enable = true;
 
@@ -177,17 +186,9 @@ services.usbmuxd.enable = true;
   # Enable acpid
   services.acpid.enable = true;
 
-  # Configure keymap in X11
-  services.xserver = {
-    layout = "us";
-    xkbVariant = "";
-  };
-
-  # Enable CUPS to print documents.
+    # Enable CUPS to print documents.
   services.printing.enable = true;
 
-  # Enable sound with pipewire.
-  sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -204,7 +205,7 @@ services.usbmuxd.enable = true;
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
-  services.xserver.libinput.enable = true;
+  services.libinput.enable = true;
 
   environment.variables = {
     SHELL = "zsh";
@@ -225,13 +226,15 @@ services.usbmuxd.enable = true;
   };
 
   # Enable automatic login for the user.
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = "guest";
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = "guest";
   # Make caps control.
   services.xserver.xkb = {
     options = "ctrl:nocaps";
     layout = "us";
+variant = "";
   };
+
 
   # Mozilla Vpn
   services.mozillavpn.enable = true;
@@ -350,13 +353,10 @@ environment.systemPackages = with pkgs; [
     (with pkgs; [
       gnome-photos
       gnome-tour
-    ])
-    ++ (with pkgs.gnome; [
+      gedit # text editor
       cheese # webcam tool
       gnome-music
-      gnome-terminal
-      gedit # text editor
-      epiphany # web browser
+       epiphany # web browser
       geary # email reader
       evince # document viewer
       gnome-characters
@@ -365,6 +365,7 @@ environment.systemPackages = with pkgs; [
       iagno # go game
       hitori # sudoku game
       atomix # puzzle game
+     gnome-terminal
     ]);
 
   home-manager = {
