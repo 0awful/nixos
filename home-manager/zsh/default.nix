@@ -38,6 +38,7 @@
       export EDITOR="emacsclient -t"
       # export VISUAL="emacsclient -c -a emacs"
 
+      export SSH_AUTH_SOCK=~/.1password/agent.sock
       # nix shortcuts
       shell() {
           nix-shell '<nixpkgs>' -A "$1"
