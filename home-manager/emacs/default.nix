@@ -1,8 +1,11 @@
-{ pkgs, inputs, config, ... }:
-
 {
+  pkgs,
+  inputs,
+  config,
+  ...
+}: {
   # Provides the daemon
- services.emacs = {
+  services.emacs = {
     enable = true;
     package = pkgs.emacs-gtk;
   };

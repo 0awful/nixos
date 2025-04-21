@@ -41,11 +41,11 @@
     (setq evil-vsplit-window-right t)
     (setq evil-split-window-below t)
     (evil-mode))
-  (use-package evil-collection
-    :after evil
-    :config
-    (setq evil-collection-mode-list '(dashboard dired ibuffer))
-    (evil-collection-init))
+(use-package evil-collection
+  :after evil
+  :config
+  (setq evil-collection-mode-list '(dashboard dired ibuffer))
+  (evil-collection-init))
 #+end_src
 
 ** General Keybindings
@@ -116,25 +116,19 @@
 #+end_src
 ** Custom K behavior
 #+begin_src emacs-lisp
-(define-key evil-normal-state-map (kbd "K")
-  (lambda ()
-    (interactive)
-    (cond
-     ;; If at a link in org-mode or similar
-     ((and (boundp 'org-mode) org-mode (org-at-link-p))
-      (org-open-at-point))
-     
-     ;; If using LSP for code navigation
-     ((and (fboundp 'lsp-find-definition)
-           (bound-and-true-p lsp-mode))
-      (lsp-find-definition))
-     
-     ;; Fallback to xref (works with many modes)
-     ((fboundp 'xref-find-definitions)
-      (xref-find-definitions (thing-at-point 'symbol)))
-     
-     ;; Last resort, try the original K behavior
-     (t (evil-lookup))))
+    (defun my/custom-evil-lookup ()  
+      (interactive)
+      (cond
+       ((eq major-mode 'org-mode)
+        (if (org-in-regexp org-link-any-re)
+    	(org-open-at-point)
+          (when (fboundp 'lsp-find-definition))))
+       (t
+        (when (fboundp 'lsp-find-definition)
+          (lsp-find-definition)))))
+
+      (define-key evil-normal-state-map (kbd "K")
+  		'my/custom-evil-lookup)
 #+end_src
 
 ** Custom C-u
@@ -143,7 +137,7 @@
 (with-eval-after-load 'evil
   ;; Unbind C-u from universal-argument
   (global-set-key (kbd "C-u") nil)
-  
+
   ;; Bind C-u to evil-scroll-up in all states
   (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
   (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
@@ -496,11 +490,11 @@ Stolen from [Thriveth](https://github.com/thriveth/Gruvbox-goodies/blob/master/E
              '(org-document-title     ((t (:foreground "#fbf1c7" :weight bold :height 1.4))))
              '(org-meta-line          ((t (:inherit shadow))))
              '(org-target             ((t (:height 0.7 :inherit shadow))))
-             '(org-link               ((t (:foreground "#b8bb26" :background "#32302f" :overline nil))))  ;; 
+             '(org-link               ((t (:foreground "#b8bb26" :background "#32302f" :overline nil))))  ;;
              '(org-indent             ((t (:inherit org-hide))))
              '(org-indent             ((t (:inherit (org-hide fixed-pitch)))))
              '(org-footnote           ((t (:foreground "#8ec07c" :background "#32302f" :overline nil))))
-             '(org-ref-cite-face      ((t (:foreground "#fabd2f" :background "#32302f" :overline nil))))  ;; 
+             '(org-ref-cite-face      ((t (:foreground "#fabd2f" :background "#32302f" :overline nil))))  ;;
              '(org-ref-ref-face       ((t (:foreground "#83a598" :background "#32302f" :overline nil))))
              '(org-ref-label-face     ((t (:inherit shadow :box t))))
              '(org-drawer             ((t (:inherit shadow))))
@@ -518,7 +512,7 @@ Stolen from [Thriveth](https://github.com/thriveth/Gruvbox-goodies/blob/master/E
              '(org-level-6            ((t (:foreground "#fb4934" :background "#282828" :weight bold :height 1.1 :overline nil :extend t)))) ;; Red
              '(org-level-7            ((t (:foreground "#d3869b" :background "#282828" :weight bold :height 1.1 :overline nil :extend t)))) ;; Blue
              '(org-headline-done      ((t (:foreground "#928374" :background "#282828" :weight bold :overline nil :extend t)))) ;; Gray
-             '(org-ellipsis           ((t (:inherit shadow :height 1.0 :weight bold :extend t)))) 
+             '(org-ellipsis           ((t (:inherit shadow :height 1.0 :weight bold :extend t))))
              '(org-table              ((t (:foreground "#d5c4a1" :background "#3c3836"))))
 
              ;; Doom-modeline settings
@@ -541,7 +535,7 @@ Stolen from [Thriveth](https://github.com/thriveth/Gruvbox-goodies/blob/master/E
              '(mu4e-forwarded-face               ((t (:inherit mu4e-header-face :foreground "#80c07c"))))
              '(mu4e-flagged-face                 ((t (:inherit mu4e-header-face))))
              '(mu4e-header-highlight-face        ((t (:underline nil :background "#3c3836"))))
-             '(mu4e-unread-face                  ((t (:foreground "#fbf1c7" :weight bold))))  ;; Originally #83a598 
+             '(mu4e-unread-face                  ((t (:foreground "#fbf1c7" :weight bold))))  ;; Originally #83a598
              '(mu4e-cited-1-face                 ((t (:foreground "#458588" :slant italic))))
              '(mu4e-cited-2-face                 ((t (:foreground "#689d6a" :slant italic))))
              '(mu4e-cited-3-face                 ((t (:foreground "#98971a" :slant italic))))
@@ -560,10 +554,10 @@ Stolen from [Thriveth](https://github.com/thriveth/Gruvbox-goodies/blob/master/E
              )
             (setq org-n-level-faces 8)
           )
-        )  
+        )
       (add-hook 'after-load-theme-hook 'customize-gruvbox)
       )
-      (load-theme 'gruvbox t) 
+      (load-theme 'gruvbox t)
       (enable-theme 'gruvbox)
     )
 #+end_src

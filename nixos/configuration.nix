@@ -88,7 +88,7 @@
   boot.loader.systemd-boot.configurationLimit = 15;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  boot.initrd.luks.devices."luks-7e224310-4795-40ef-8cfe-035ab0904364".device = "/dev/disk/by-uuid/7e224310-4795-40ef-8cfe-035ab0904364";
+  #boot.initrd.luks.devices."luks-7e224310-4795-40ef-8cfe-035ab0904364".device = "/dev/disk/by-uuid/7e224310-4795-40ef-8cfe-035ab0904364";
 
   networking.hostName = "nixos"; # Define your hostname.
   networking.nameservers = [
@@ -96,62 +96,86 @@
     "9.9.9.9"
   ];
 
-networking = {
-  wireless = {
+  networking = {
+    wireless = {
+      enable = true;
+      userControlled.enable = true;
+      extraConfig = ''
+        ctrl_interface=/run/wpa_supplicant
+        ctrl_interface_group=wheel
+        update_config=1
+      '';
+    };
+    networkmanager = {
+      enable = false;
+      wifi = {
+        powersave = false;
+        macAddress = "preserve";
+      };
+      logLevel = "DEBUG";
+    };
+  };
+  services.connman = {
     enable = true;
-    userControlled.enable = true;
     extraConfig = ''
-                ctrl_interface=/run/wpa_supplicant
-                ctrl_interface_group=wheel
-                update_config=1
+      [General]
+      AllowHostnameUpdates=false
+      PreferredTechnologies=wifi,ethernet
+      # Disable WiFi power saving
+      WiFiPowerSave=off
+
+      [WiFi]
+      # Disable internal WiFi power management
+      DisablePowerManagement=true
+      # Disable periodic scans when connected
+      DisablePeriodicScan=true
     '';
   };
-  networkmanager = {
-    enable = false;
-    wifi = {
-      powersave = false;
-      macAddress = "preserve";
-    };
-    logLevel = "DEBUG";
+
+  # ==============================================================================
+  # = Prevent hibernation                                                        =
+  # ==============================================================================
+
+  services.logind = {
+    lidSwitch = "suspend";
+    extraConfig = ''
+      HandleHibernateKey = ignore
+      HandleHibernateSleep = ignore
+      IdleAction = ignore
+    '';
   };
-};
-services.connman = {
-  enable = true;
-  extraConfig = ''
-    [General]
-    AllowHostnameUpdates=false
-    PreferredTechnologies=wifi,ethernet
-    # Disable WiFi power saving
-    WiFiPowerSave=off
 
-    [WiFi]
-    # Disable internal WiFi power management
-    DisablePowerManagement=true
-    # Disable periodic scans when connected
-    DisablePeriodicScan=true
+  systemd.sleep.extraConfig = ''
+    AllowHibernation = no
+    AllowSuspendThenHibernate = no
   '';
-};
 
-# Make sure firmware is available
-hardware.enableAllFirmware = true;
-# System-wide power management settings
-powerManagement = {
-  enable = true;  # Keep enabled but configure for performance
-  cpuFreqGovernor = "performance";  # Always run CPU at full speed
-};
+  # ==============================================================================
+  # = Fix for 'old laptop' wifi chipset issues.                                  =
+  # ==============================================================================
 
-# Disable various power management services
-services.power-profiles-daemon.enable = false;  # Disable power profiles
-services.tlp.enable = false;  # Disable TLP if it's enabled
-services.thermald.enable = false;  # Disable Intel's thermal daemon
+  # Make sure firmware is available
+  hardware.enableAllFirmware = true;
+  # System-wide power management settings
+  powerManagement = {
+    enable = true; # Keep enabled but configure for performance
+    cpuFreqGovernor = "performance"; # Always run CPU at full speed
+  };
 
-# Add kernel parameters to disable more power saving features
-boot.kernelParams = [
-  "intel_idle.max_cstate=1"  # Limit CPU power saving states
-  "pcie_aspm=off"  # Disable PCIe power saving
-];
+  # Disable various power management services
+  services.power-profiles-daemon.enable = false; # Disable power profiles
+  services.tlp.enable = false; # Disable TLP if it's enabled
+  services.thermald.enable = false; # Disable Intel's thermal daemon
 
-services.usbmuxd.enable = true;
+  # Add kernel parameters to disable more power saving features
+  boot.kernelParams = [
+    "intel_idle.max_cstate=1" # Limit CPU power saving states
+    "pcie_aspm=off" # Disable PCIe power saving
+  ];
+
+  # ==============================================================================
+
+  services.usbmuxd.enable = true;
 
   # Mount some devices
   services.gvfs.enable = true;
@@ -186,7 +210,7 @@ services.usbmuxd.enable = true;
   # Enable acpid
   services.acpid.enable = true;
 
-    # Enable CUPS to print documents.
+  # Enable CUPS to print documents.
   services.printing.enable = true;
 
   hardware.pulseaudio.enable = false;
@@ -232,9 +256,8 @@ services.usbmuxd.enable = true;
   services.xserver.xkb = {
     options = "ctrl:nocaps";
     layout = "us";
-variant = "";
+    variant = "";
   };
-
 
   # Mozilla Vpn
   services.mozillavpn.enable = true;
@@ -256,27 +279,25 @@ variant = "";
   fonts.packages = with pkgs; [
     nerdfonts
     emacs-all-the-icons-fonts
-];
-   fonts.fontDir.enable = true;
+  ];
+  fonts.fontDir.enable = true;
 
+  environment.systemPackages = with pkgs; [
+    # networking tools
+    networkmanager
+    networkmanagerapplet
+    iw
+    pciutils
+    usbutils
+    ethtool
+    linux-firmware
+    tcpdump
+    wavemon
 
-environment.systemPackages = with pkgs; [
-  # networking tools
-  networkmanager
-  networkmanagerapplet
-  iw
-  pciutils
-  usbutils
-  ethtool
-  linux-firmware
-  tcpdump
-  wavemon
-
-  # Connman tools
-  cmst
-  connman-gtk
-  connman-ncurses
-
+    # Connman tools
+    cmst
+    connman-gtk
+    connman-ncurses
 
     # iphone
     libimobiledevice
@@ -297,12 +318,11 @@ environment.systemPackages = with pkgs; [
     # gamecube/wii emu
     dolphin-emu
 
-
     pcmanfm
 
     ## Unorg
     ## --------------
-    unstable.godot_4
+    ## unstable.godot_4 temp disable
     tree
     lazygit
     unar
@@ -349,24 +369,23 @@ environment.systemPackages = with pkgs; [
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
 
-  environment.gnome.excludePackages =
-    (with pkgs; [
-      gnome-photos
-      gnome-tour
-      gedit # text editor
-      cheese # webcam tool
-      gnome-music
-       epiphany # web browser
-      geary # email reader
-      evince # document viewer
-      gnome-characters
-      totem # video player
-      tali # poker game
-      iagno # go game
-      hitori # sudoku game
-      atomix # puzzle game
-     gnome-terminal
-    ]);
+  environment.gnome.excludePackages = with pkgs; [
+    gnome-photos
+    gnome-tour
+    gedit # text editor
+    cheese # webcam tool
+    gnome-music
+    epiphany # web browser
+    geary # email reader
+    evince # document viewer
+    gnome-characters
+    totem # video player
+    tali # poker game
+    iagno # go game
+    hitori # sudoku game
+    atomix # puzzle game
+    gnome-terminal
+  ];
 
   home-manager = {
     extraSpecialArgs = {inherit inputs outputs;};

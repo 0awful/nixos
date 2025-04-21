@@ -23,7 +23,7 @@ boot:
   nixos-rebuild boot --flake .#guest --use-remote-sudo
 
 update:
-  nix flake update
+  nix flake update --extra-experimental-features nix-command --extra-experimental-features flakes
 
 update-package:
   nix flake lock --update-input $(i)
