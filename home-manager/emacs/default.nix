@@ -13,24 +13,27 @@
   programs.emacs = {
     enable = true;
     package = pkgs.emacs-gtk;
-    extraPackages = epkgs: [
-      epkgs.use-package
-      epkgs.evil
-      epkgs.evil-collection
-      epkgs.general
-      epkgs.which-key
-      epkgs.toc-org
-      epkgs.org-bullets
-      epkgs.gruvbox-theme
-      epkgs.nix-mode
-      epkgs.sudo-edit
-      epkgs.ivy
-      epkgs.ivy-rich
-      epkgs.counsel
-      epkgs.all-the-icons-ivy-rich
-      epkgs.all-the-icons
-      epkgs.all-the-icons-dired
-      epkgs.avy
+    extraPackages = epkgs: with epkgs; [
+      use-package
+      evil
+      evil-collection
+      general
+      which-key
+      toc-org
+      org-bullets
+      gruvbox-theme
+      nix-mode
+      sudo-edit
+      all-the-icons-ivy-rich
+      all-the-icons
+      all-the-icons-dired
+      avy
+      vertico
+      marginalia
+      consult
+      embark
+      embark-consult
+      orderless
     ];
   };
 
