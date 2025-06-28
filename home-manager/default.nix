@@ -1,14 +1,34 @@
 # This is your home-manager configuration file
 # Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
 {
-  outputs,
+  inputs,
   pkgs,
   ...
 }: {
   # let home-manager control itself
   programs.home-manager.enable = true;
+
+ nixpkgs = {
+    overlays = [
+      inputs.self.overlays.additions
+      inputs.self.overlays.modifications
+      inputs.self.overlays.unstable-packages
+      inputs.self.overlays.emacs-packages
+    ];
+
+    config = {
+      allowUnfree = true;
+      # Workaround for https://github.com/nix-community/home-manager/issues/2942
+      allowUnfreePredicate = _: true;
+
+      permittedInsecurePackages = [
+        "electron-25.9.0" # for discord
+      ];
+    };
+  };
+
   # let home-manager help programs find fonts (technically manage your font config)
-  fonts = {
+ fonts = {
     fontconfig.enable = true;
   };
 
@@ -46,25 +66,7 @@
   # I am not importing all the folders because I don't use all the things, but I want to be able to return to them.
   # The configs live on, but are not a part of the system
 
-  nixpkgs = {
-    overlays = [
-      outputs.overlays.additions
-      outputs.overlays.modifications
-      outputs.overlays.unstable-packages
-    ];
-
-    config = {
-      allowUnfree = true;
-      # Workaround for https://github.com/nix-community/home-manager/issues/2942
-      allowUnfreePredicate = _: true;
-
-      permittedInsecurePackages = [
-        "electron-25.9.0" # for discord
-      ];
-    };
-  };
-
-  home = {
+   home = {
     username = "guest";
     homeDirectory = "/home/guest";
   };

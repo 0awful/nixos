@@ -2,7 +2,6 @@
 # Use this to configure your system environment (it replaces /etc/nixos/configuration.nix)
 {
   inputs,
-  outputs,
   lib,
   config,
   pkgs,
@@ -33,7 +32,6 @@
 
   imports = [
     inputs.home-manager.nixosModules.home-manager
-
     inputs.nixvim.nixosModules.nixvim
     # If you want to use modules your own flake exports (from modules/nixos):
     # outputs.nixosModules.example
@@ -52,10 +50,13 @@
   nixpkgs = {
     # You can add overlays here
     overlays = [
+      inputs.self.overlays.mako-fix
+     
       # Add overlays your own flake exports (from overlays and pkgs dir):
-      outputs.overlays.additions
-      outputs.overlays.modifications
-      outputs.overlays.unstable-packages
+      inputs.self.overlays.additions
+      inputs.self.overlays.modifications
+      inputs.self.overlays.unstable-packages
+      inputs.self.overlays.emacs-packages
 
       # Or define it inline, for example:
       # (final: prev: {
@@ -131,6 +132,11 @@
       DisablePeriodicScan=true
     '';
   };
+  # ==============================================================================
+  # =  Dbus                                                       =
+  # ==============================================================================
+
+ services.dbus.enable = true;
 
   # ==============================================================================
   # = Prevent hibernation                                                        =
@@ -283,6 +289,13 @@
   fonts.fontDir.enable = true;
 
   environment.systemPackages = with pkgs; [
+    # C compilers
+    clang
+    gcc
+
+    # Os level text editing
+    emacs
+
     # networking tools
     networkmanager
     networkmanagerapplet
@@ -388,7 +401,7 @@
   ];
 
   home-manager = {
-    extraSpecialArgs = {inherit inputs outputs;};
+    extraSpecialArgs = {inherit inputs ;};
     users = {
       guest = import ../home-manager;
     };

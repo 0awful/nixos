@@ -1,5 +1,7 @@
 {
   description = "Your new nix config";
+# taken from https://github.com/Misterio77/nix-starter-configs
+
 
   inputs = {
     # Nixpkgs
@@ -12,7 +14,8 @@
     # Home manager
     home-manager.url = "github:nix-community/home-manager/release-24.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-
+ 
+    emacs-overlay.url = "github:nix-community/emacs-overlay";  
     nixvim = {
       url = "github:nix-community/nixvim/nixos-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,10 +35,9 @@
     self,
     nixpkgs,
     home-manager,
-    # nixvim,
+    emacs-overlay,
     ...
   } @ inputs: let
-    inherit (self) outputs;
     # Supported systems for your flake packages, shell, etc.
     systems = [
       "aarch64-linux"
@@ -67,7 +69,7 @@
     # Available through 'nixos-rebuild --flake .#your-hostname'
     nixosConfigurations = {
       guest = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs outputs;};
+        specialArgs = {inherit inputs;};
         modules = [
           # > Our main nixos configuration file <
           ./nixos/configuration.nix
@@ -81,7 +83,7 @@
     homeConfigurations = {
       "guest@guest" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
-        extraSpecialArgs = {inherit inputs outputs;};
+        extraSpecialArgs = {inherit inputs;};
         modules = [
           # > Our main home-manager configuration file <
           ./home-manager/home.nix

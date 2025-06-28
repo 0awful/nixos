@@ -9,7 +9,20 @@
     # nixvim = inputs.nixvim.homeManagerModules.nixvim;
     # nixssss = inputs.garbage.that.doesnt.exist;
   };
-
+# Add to your overlays
+mako-fix = final: prev: {
+  formats = prev.formats // {
+    ini = args: let 
+      result = prev.formats.ini args;
+    in result // {
+      lib = { 
+        types = { 
+          atom = prev.lib.types.str; 
+        }; 
+      };
+    };
+  };
+};
   # When applied, the unstable nixpkgs set (declared in the flake inputs) will
   # be accessible through 'pkgs.unstable'
   unstable-packages = final: _prev: {
@@ -18,4 +31,6 @@
       config.allowUnfree = true;
     };
   };
+
+  emacs-packages = inputs.emacs-overlay.overlay;
 }
